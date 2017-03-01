@@ -1,35 +1,36 @@
+
 <div id="wrapper">
 	<div id="search-wrapper">
-		<?php
-			require_once(APP . 'view/_templates/search_form.php');
-		?>
+		<form id="search" action="<?php echo URL; ?>search" method="GET">
+			<input type="text" name="q"
+			       placeholder="Enter City or ZIP" <?php if (!empty($_GET['q'])) echo "value='" . $_GET["q"] . "'"; ?> />
+			<select name="br">
+				<option value="0" <?php if ($_GET["br"] === '0') echo ' selected="selected"'; ?>>Studio</option>
+				<option value="1" <?php if ($_GET["br"] === '1') echo ' selected="selected"'; ?>>1 Bedroom</option>
+				<option value="2" <?php if ($_GET["br"] === '2') echo ' selected="selected"'; ?>>2 Bedroom</option>
+				<option value="3" <?php if ($_GET["br"] === '3') echo ' selected="selected"'; ?>>3+ Bedroom</option>
+			</select>
+			<input type="submit" class="btn btn-default" value="Search"/>
+		</form>
 	</div>
 	<div id="results-wrapper">
 		<ul id="listings">
 			<?php
 			foreach ($listings as $i => $row) {
-
+				
 				$rent = $row["MonthlyRent"];
-                $img = $this->retrieveBlob($row["ListingId"]);
-				$address = $row["StreetName"] . ', ' . $row["City"] . ', CA ' . $row["ZIP"];
+				$address = $row["StreetNo"] . ' ' . $row["StreetName"] . ', ' . $row["City"] . ', CA ' . $row["ZIP"];
 				$bedrooms = $row['Bedrooms'];
 				$baths = $row['Baths'];
 				$sqft = $row['SqFt'];
 				$description = $row['Description'];
-				#convert $row into URL encoded query string
-				$idPass = http_build_query(array('detail' => $row["ListingId"]));
-				foreach ($_GET as $key => $value) {
-					if ($key != 'url') {
-                        if($key == 'utilities'){
-                            foreach($_GET[$key] as $values){
-                                $idPass .= "utilities[]=".$values;
-                            }
-                        }else{
-    						$idPass .= "&" . $key . "=" . $value;
-                        }
-					}
-
-				}
+				#convert $row into URL rncoded query string
+                $idPass = http_build_query(array('detail' => $row["ListingId"]));
+                foreach($_GET as $key => $value){
+                    if($key != 'url'){
+                        $idPass .= "&" . $key . "=" . $value;
+                    }
+                }
 
 				echo "<li class='listing'>\n";
 
@@ -51,12 +52,11 @@
 				echo "		<div class='photos listing-details-left'>\n";
 				#passes ListingId to Listing_detail page
 				echo "    	<a href='" . URL . "listing_detail?$idPass'> ";
-                            if($img != null){
-                                echo "<img class='col-sm-4' id='imgMaxSize' src='data:image/" . $img[0]['Format'] . ";base64," 
-                                     . base64_encode($img[0]['Data']) . "'/>";
-                             }else{
-				echo "			<img src='" . URL . "public/img/placeholder.png' height='150px' width='150px'/> ";
-                             }
+				 if($img != null){
+                                            echo "<img class='col-sm-4' id='imgMaxSize' src='data:image/" . $img[0]['Format'] . ";base64," . base64_encode($img[0]['Data']) . "'/>";
+                                        }
+                                        else
+                                            echo "<img class='col-sm-4' src='". URL ."public/img/placeholder.png' height='150px' width='150px'/>";
 				echo "		</a>\n";
 				echo "		</div>\n";
 
@@ -109,8 +109,8 @@
 
 								<div class="col-sm-8">
 									<div class="address">
-										<p><?php $address?></p>
-										<p></p>
+										<p>900 Folsom St</p>
+										<p>San Francisco, CA 94105</p>
 									</div>
 									<div class="rental-details">
 										<p><span class="bedrooms">Studio</span> &nbsp; <span class="baths">1 Bath</span></p>
